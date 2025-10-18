@@ -9,10 +9,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
     """ Handles user registration."""
     repeated_password = serializers.CharField(write_only=True)
     username = serializers.CharField(write_only=True)
+    type = serializers.ChoiceField(choices=['customer', 'business'], write_only=True)
 
     class Meta:
         model = User
-        fields = ['fullname', 'email', 'password', 'repeated_password']
+        fields = ['username', 'email', 'password', 'repeated_password', 'type']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -28,13 +29,18 @@ class RegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'password': 'Passwords do not match'})
         return data
+
     def create(self, validated_data):
-        validated_data['username'] = validated_data['username']
+        user_type = validated_data.pop('type')
         validated_data.pop('repeated_password')
+
         user = User(
             username=validated_data['username'],
             email=validated_data['email']
         )
         user.set_password(validated_data['password'])
         user.save()
+
+        from profiles.models import Profile
+        Profile.objects.create(user=user, type=user_type)
         return user

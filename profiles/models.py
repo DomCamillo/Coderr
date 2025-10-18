@@ -8,7 +8,7 @@ class Profile(models.Model):
         ('customer', 'Customer')
     ]
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    file = models.ImageField(upload_to='profiles/', null=True, blank=True)
+    file = models.FileField(upload_to='uploads/')
     location = models.CharField(max_length=100, null=True, blank=True)
     tel_number = models.CharField(max_length=20, null=True, blank=True)
     working_hours = models.CharField(max_length=100, null=True, blank=True)

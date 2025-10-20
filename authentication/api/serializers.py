@@ -31,6 +31,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        from profiles.models import Profile
         user_type = validated_data.pop('type')
         validated_data.pop('repeated_password')
 
@@ -41,6 +42,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
 
-        from profiles.models import Profile
+
         Profile.objects.create(user=user, type=user_type)
         return user

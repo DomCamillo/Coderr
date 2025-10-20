@@ -2,15 +2,13 @@
 from .serializers import   RegistrationSerializer
 from django.contrib.auth import authenticate, get_user_model
 
-from django.http import Http404
-from rest_framework import generics
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import NotAuthenticated ,NotFound, PermissionDenied ,ValidationError
-from rest_framework import serializers
+
 
 
 

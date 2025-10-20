@@ -9,8 +9,20 @@ class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email')
     class Meta:
         model = Profile
-        fields = ['id', 'user', 'location', 'tel_number', 'working_hours', 'type', 'created_at']
+        fields = ['id', 'user', 'location', 'tel', 'working_hours', 'type', 'created_at','email','username','first_name','last_name','file','description']
         read_only_fields = ['type', 'user', 'created_at']
+
+    def to_representation(self, instance):
+        """"to ensure that certain fields are never null in the output"""
+        data = super().to_representation(instance)
+
+        empty_string_fields = ['first_name', 'last_name', 'location', 'tel', 'description', 'working_hours']
+
+        for field in empty_string_fields:
+            if data.get(field) is None:
+                data[field] = ''
+
+        return data
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
@@ -22,3 +34,5 @@ class ProfileSerializer(serializers.ModelSerializer):
         user.save()
 
         return super().update(instance, validated_data)
+
+

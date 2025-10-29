@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from orders.models import Order
-from django.db.models import Q # Encapsulate filters as objects that can then be combined logically (using & and |)
+from django.db.models import Q
 from rest_framework.permissions import IsAuthenticatedOrReadOnly , IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
 from orders.api.permissions import IsCustomer, IsOrderBusinessUser

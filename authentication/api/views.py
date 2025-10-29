@@ -1,15 +1,15 @@
 
 from .serializers import   RegistrationSerializer
 from django.contrib.auth import authenticate, get_user_model
-
-from rest_framework import status, viewsets
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
-from rest_framework.exceptions import NotAuthenticated ,NotFound, PermissionDenied ,ValidationError
+from rest_framework.throttling import AnonRateThrottle
 
-
+class LoginRateThrottle(AnonRateThrottle):
+    rate = '5/minute'
 
 
 class LoginView(APIView):
@@ -17,6 +17,7 @@ class LoginView(APIView):
     Authenticates user by username + password, returns token and user info."""
     permission_classes = [AllowAny]
     authentication_classes = []
+    throttle_classes = [LoginRateThrottle]
 
     def post(self, request):
         username = request.data.get("username")
@@ -43,6 +44,7 @@ class RegistrationView(APIView):
      On success, returns token and created user info."""
     permission_classes = [AllowAny]
     authentication_classes = []
+    throttle_classes = [LoginRateThrottle]
 
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)

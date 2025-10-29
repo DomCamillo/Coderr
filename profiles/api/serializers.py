@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from profiles.models import Profile
+from rest_framework.permissions import IsAuthenticated
 
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username',read_only=True)
@@ -9,7 +10,9 @@ class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email')
     class Meta:
         model = Profile
-        fields = ['id', 'user', 'location', 'tel', 'working_hours', 'type', 'created_at','email','username','first_name','last_name','file','description']
+        fields = ['id', 'user', 'location', 'tel', 'working_hours', 'type',
+                  'created_at','email','username',
+                  'first_name','last_name','file','description']
         read_only_fields = ['type', 'user', 'created_at']
 
     def to_representation(self, instance):
@@ -32,6 +35,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         user.last_name = user_data.get('last_name', user.last_name)
         user.email = user_data.get('email', user.email)
         user.save()
+
+        if 'file' in validated_data and validated_data['file'] is None:
+            if instance.file:
+                instance.file.delete(save=False)
 
         return super().update(instance, validated_data)
 

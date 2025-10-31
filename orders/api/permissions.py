@@ -12,7 +12,7 @@ class IsCustomer(permissions.BasePermission):
             request.user.profile.type == 'customer'
         )
 
-    class IsBusinessUser(permissions.BasePermission):
+class IsBusinessUser(permissions.BasePermission):
         """Only Business User can access"""
         message = 'Only Business-User can change the status'
 

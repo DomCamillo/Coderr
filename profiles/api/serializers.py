@@ -10,9 +10,9 @@ class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email')
     class Meta:
         model = Profile
-        fields = ['id', 'user', 'location', 'tel', 'working_hours', 'type',
-                  'created_at','email','username',
-                  'first_name','last_name','file','description']
+        fields = ['user', 'username', 'first_name', 'last_name', 'file',
+                  'location', 'tel', 'description', 'working_hours', 'type', 'email','created_at']
+
         read_only_fields = ['type', 'user', 'created_at']
 
     def to_representation(self, instance):
@@ -43,3 +43,25 @@ class ProfileSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+class ProfileListSerializer(serializers.ModelSerializer):
+    """"""
+    username = serializers.CharField(source='user.username', read_only=True)
+    first_name = serializers.CharField(source='user.first_name', read_only=True)
+    last_name = serializers.CharField(source='user.last_name', read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ['user', 'username', 'first_name', 'last_name', 'file',
+                  'location', 'tel', 'description', 'working_hours', 'type']
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        empty_string_fields = ['first_name', 'last_name', 'location',
+                               'tel', 'description', 'working_hours']
+
+        for field in empty_string_fields:
+            if data.get(field) is None:
+                data[field] = ''
+
+        return data

@@ -2,7 +2,7 @@ from django.http import Http404
 from rest_framework import generics
 from profiles.models import Profile
 from rest_framework.response import Response
-from profiles.api.serializers import ProfileSerializer
+from profiles.api.serializers import ProfileSerializer, ProfileListSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 
@@ -14,12 +14,14 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
 
 class BusinessProfileView(generics.ListAPIView):
     queryset = Profile.objects.filter(type='business')
-    serializer_class = ProfileSerializer
+    serializer_class = ProfileListSerializer
+    pagination_class = None
 
 
 class CustomerProfileView(generics.ListAPIView):
     queryset = Profile.objects.filter(type='customer')
-    serializer_class = ProfileSerializer
+    serializer_class = ProfileListSerializer
+    pagination_class = None
 
 
 @api_view(['DELETE'])

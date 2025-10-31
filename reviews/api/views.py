@@ -18,6 +18,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields = ['updated_at', 'rating']
     ordering=['-created_at']
+    pagination_class = None
 
 
     def get_queryset(self):

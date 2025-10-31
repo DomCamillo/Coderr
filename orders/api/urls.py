@@ -8,8 +8,8 @@ router.register(r'orders', OrderViewSet, basename='orders')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('order-count/<int:business_user_id>', OrderCountView.as_view(), name='order-count'),
-    path('completed-order-count/<int:business_user_id>', OrderCountCompletedView.as_view(), name='order-completed-count'),
+    path('order-count/<int:business_user_id>/', OrderCountView.as_view(), name='order-count'),
+    path('completed-order-count/<int:business_user_id>/', OrderCountCompletedView.as_view(), name='order-completed-count'),
 ]
 
 

@@ -1,5 +1,4 @@
-from django.urls import path, include
-from rest_framework.routers import SimpleRouter
+from django.urls import path
 from profiles.api.views import CustomerProfileView, BusinessProfileView, ProfileDetailView, delete_profile_image
 
 

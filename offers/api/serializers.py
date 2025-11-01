@@ -60,9 +60,10 @@ class OfferSerializer(serializers.ModelSerializer):
             required_types = ['basic', 'standard', 'premium']
 
             if sorted(types) != sorted(required_types):
-                raise serializers.ValidationError(
-                "Details must include basic, standard, and premium types!"
-             )
+                raise serializers.ValidationError( "Details must include basic, standard, and premium types!")
+        else:
+            if value is not None and len(value) == 0:
+                raise serializers.ValidationError("Details cannot be empty. Provide at least one detail to update.")
         return value
 
     def create(self, validated_data):
@@ -82,7 +83,6 @@ class OfferSerializer(serializers.ModelSerializer):
             for detail_data in details_data:
                 offer_type = detail_data.get('offer_type')
                 if offer_type:
-                    # Update existing detail by offer_type
                     detail = instance.details.filter(offer_type=offer_type).first()
                     if detail:
                         for key, value in detail_data.items():

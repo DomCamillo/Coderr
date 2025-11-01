@@ -1,7 +1,7 @@
 from django_filters import rest_framework as filters
 from rest_framework import filters as drf_filters
 from rest_framework import status, viewsets
-from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from orders.api.permissions import IsBusinessUser
 from offers.models import Offer, OfferDetails
 from offers.api.serializers import OfferSerializer, OfferDetailsSerializer, OfferListSerializer ,OfferDetailSerializer
@@ -33,18 +33,33 @@ class OfferViewSet(viewsets.ModelViewSet):
         else:
             return OfferSerializer
     def get_queryset(self):
-        """Custom filtering für min_price und max_delivery_time"""
         queryset = Offer.objects.all()
 
         min_price = self.request.query_params.get('min_price')
         if min_price:
-            queryset = queryset.filter(details__price__gte=min_price).distinct()
+            try:
+                min_price = float(min_price)
+                if min_price < 0:
+                    raise ValueError("Must be positive")
+                queryset = queryset.filter(details__price__gte=min_price).distinct()
+            except (ValueError, TypeError):
+                raise ValidationError({
+                    "min_price": "Must be a valid positive number"
+                })
 
         max_delivery_time = self.request.query_params.get('max_delivery_time')
         if max_delivery_time:
-            queryset = queryset.filter(
-                details__delivery_time_in_days__lte=max_delivery_time
-            ).distinct()
+            try:
+                max_delivery_time = int(max_delivery_time)
+                if max_delivery_time < 0:
+                    raise ValueError("Must be positive")
+                queryset = queryset.filter(
+                    details__delivery_time_in_days__lte=max_delivery_time
+                ).distinct()
+            except (ValueError, TypeError):
+                raise ValidationError({
+                    "max_delivery_time": "Must be a valid positive integer"
+                })
 
         return queryset
 

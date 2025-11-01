@@ -1,11 +1,12 @@
-
+from rest_framework.exceptions import NotFound
 from rest_framework import generics
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from orders.models import Order
 from django.db.models import Q
-from rest_framework.permissions import IsAuthenticatedOrReadOnly , IsAuthenticated, IsAdminUser
-from rest_framework.views import APIView
+from rest_framework.permissions import   IsAuthenticated, IsAdminUser
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from orders.api.permissions import IsCustomer, IsOrderBusinessUser
 from orders.api.serializers import (
     OrderSerializer,
@@ -15,7 +16,7 @@ from orders.api.serializers import (
 )
 
 
-
+User = get_user_model()
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -63,6 +64,9 @@ class OrderCountView(generics.GenericAPIView):
     serializer_class = OrderCountSerializer
 
     def get(self, request, business_user_id):
+        business_user = get_object_or_404(User, id=business_user_id)
+        if hasattr(business_user, 'type') and business_user.type != 'business':
+            raise NotFound("User is not a business user.")
         count = Order.objects.filter(business_user_id=business_user_id,status='in_progress').count()
         serializer = self.get_serializer(data={'order_count': count})
         serializer.is_valid()
@@ -78,6 +82,9 @@ class OrderCountCompletedView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, business_user_id):
+        business_user = get_object_or_404(User, id=business_user_id)
+        if hasattr(business_user, 'type') and business_user.type != 'business':
+            raise NotFound("User is not a business user.")
         count = Order.objects.filter(business_user_id=business_user_id,status='completed').count()
         serializer = self.get_serializer(data={'completed_order_count': count})
         serializer.is_valid()

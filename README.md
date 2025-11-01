@@ -171,7 +171,7 @@ Admin panel:
 
 | Method | Endpoint          | Description              | Auth Required      |
 |--------|-------------------|--------------------------|---------------------|
-| GET    | `/api/offers/`    | List all offers          | Yes                 |
+| GET    | `/api/offers/`    | List all offers          | No                 |
 | POST   | `/api/offers/`    | Create offer (3 tiers)   | Yes (Business only) |
 | GET    | `/api/offers/{id}/` | Get offer details      | Yes                 |
 | PATCH  | `/api/offers/{id}/` | Update offer           | Yes (Owner)         |

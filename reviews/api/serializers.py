@@ -3,6 +3,8 @@ from reviews.models import Review
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """Serializer for Review model with validation to prevent duplicate reviews
+    and only allow reviews for business users"""
     class Meta:
         model = Review
         fields = ['id', 'business_user','reviewer','rating','description', 'created_at', 'updated_at']

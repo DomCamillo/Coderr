@@ -11,7 +11,7 @@ from django.db.models import Q
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
-    """CURD for Reviews"""
+    """ Simple CURD for Reviews with dynamic costume permissions and filtering """
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
     filter_fields=['business_user', 'reviewer']

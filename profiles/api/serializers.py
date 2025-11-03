@@ -4,6 +4,11 @@ from profiles.models import Profile
 from rest_framework.permissions import IsAuthenticated
 
 class ProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for detailed profile view (GET/PATCH).
+    Handles nested user fields (first_name, last_name, email) and ensures
+    certain fields return empty strings instead of null.
+    """
     username = serializers.CharField(source='user.username',read_only=True)
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
@@ -18,16 +23,18 @@ class ProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """"to ensure that certain fields are never null in the output"""
         data = super().to_representation(instance)
-
         empty_string_fields = ['first_name', 'last_name', 'location', 'tel', 'description', 'working_hours']
-
         for field in empty_string_fields:
             if data.get(field) is None:
                 data[field] = ''
-
         return data
 
     def update(self, instance, validated_data):
+        """
+        Update profile and related user fields.
+        Handles nested user data (first_name, last_name, email) and
+        deletes profile image if explicitly set to None.
+        """
         user_data = validated_data.pop('user', {})
         user = instance.user
 
@@ -39,12 +46,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         if 'file' in validated_data and validated_data['file'] is None:
             if instance.file:
                 instance.file.delete(save=False)
-
         return super().update(instance, validated_data)
 
 
 class ProfileListSerializer(serializers.ModelSerializer):
-    """"""
+    """
+    Lightweight serializer for profile lists (business/customer).
+    Returns only essential fields with empty strings instead of null values.
+    """
     username = serializers.CharField(source='user.username', read_only=True)
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
@@ -63,5 +72,4 @@ class ProfileListSerializer(serializers.ModelSerializer):
         for field in empty_string_fields:
             if data.get(field) is None:
                 data[field] = ''
-
         return data

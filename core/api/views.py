@@ -7,7 +7,11 @@ from profiles.models import Profile
 from reviews.models import Review
 
 class BaseInfoView(APIView):
+    """  API view to provide base platform statistics.
+    Returns review count, average rating, business profile count, and offer count.
+    No authentication required - public endpoint."""
     permission_classes = []
+
     def get(self, request):
         review_count = Review.objects.count()
         average_rating = Review.objects.aggregate(avg=Avg('rating'))['avg']

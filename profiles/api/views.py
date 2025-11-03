@@ -9,27 +9,23 @@ from rest_framework.exceptions import PermissionDenied
 from profiles.api.permissions import IsOwnerOrReadOnly
 from rest_framework.decorators import api_view, permission_classes
 
-
-
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
+        """Ensure users can only access their own profile for updates."""
         obj = super().get_object()
         if self.request.method in ['PATCH', 'PUT']:
             if obj.user != self.request.user:
              raise PermissionDenied('You can only access your own profile.')
         return obj
-
-
 class BusinessProfileView(generics.ListAPIView):
     queryset = Profile.objects.filter(type='business')
     serializer_class = ProfileListSerializer
     pagination_class = None
     permission_classes = [IsAuthenticated]
-
 
 class CustomerProfileView(generics.ListAPIView):
     queryset = Profile.objects.filter(type='customer')
@@ -37,7 +33,7 @@ class CustomerProfileView(generics.ListAPIView):
     pagination_class = None
     permission_classes = [IsAuthenticated]
 
-
+"""View for deleting your profile image."""
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_profile_image(request, pk):

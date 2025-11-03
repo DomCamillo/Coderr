@@ -14,12 +14,11 @@ from orders.api.serializers import (
     OrderCountSerializer,
     CompletedOrderCountSerializer
 )
-
-
 User = get_user_model()
 
 
 class OrderViewSet(viewsets.ModelViewSet):
+    """Viewset for managing Orders with dynamic permissions and serializers"""
     permission_classes = [IsAuthenticated]
     pagination_class = None
 
@@ -60,6 +59,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 class OrderCountView(generics.GenericAPIView):
+    """View to get count of in progress ordes from a business user"""
     permission_classes = [IsAuthenticated]
     serializer_class = OrderCountSerializer
 

@@ -10,6 +10,9 @@ class OfferDetailsSerializer(serializers.ModelSerializer):
                   'price', 'features', 'offer_type']
         read_only_fields = ['id']
 
+
+
+
 class OfferDetailSerializer(serializers.ModelSerializer):
     """Serializer for GET /api/offers/{id}/ - only shows URLs of Details"""
     details = serializers.SerializerMethodField()
@@ -45,7 +48,7 @@ class OfferDetailSerializer(serializers.ModelSerializer):
 
 class OfferSerializer(serializers.ModelSerializer):
     """Serializer for POST and PATCH - with full Details"""
-    details = OfferDetailsSerializer(many=True)
+    details = OfferDetailsSerializer(many=True,)
 
     class Meta:
         model = Offer
@@ -53,6 +56,8 @@ class OfferSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def validate_details(self, value):
+        """ Ensure exactly 3 details with required types on creation.
+        On update, ensure at least one detail is provided. On patch details must include 'offer_type'."""
         if self.instance is None:
             if len(value) != 3:
                 raise serializers.ValidationError("Offer needs exactly 3 details!")
@@ -62,8 +67,11 @@ class OfferSerializer(serializers.ModelSerializer):
             if sorted(types) != sorted(required_types):
                 raise serializers.ValidationError( "Details must include basic, standard, and premium types!")
         else:
-            if value is not None and len(value) == 0:
+            if value is None or len(value) == 0:
                 raise serializers.ValidationError("Details cannot be empty. Provide at least one detail to update.")
+            for detail in value:
+                if 'offer_type' not in detail:
+                    raise serializers.ValidationError("Each detail must include 'offer_type' field.")
         return value
 
     def create(self, validated_data):
@@ -94,6 +102,7 @@ class OfferSerializer(serializers.ModelSerializer):
 
 
 class OfferListSerializer(serializers.ModelSerializer):
+    """Serializer for listing offers - includes user details and summary info"""
     user_details = serializers.SerializerMethodField()
     details = serializers.SerializerMethodField()
     min_price = serializers.SerializerMethodField()
@@ -106,6 +115,7 @@ class OfferListSerializer(serializers.ModelSerializer):
                   'min_price', 'min_delivery_time', 'user_details']
 
     def get_details(self, obj):
+        """Return list of detail IDs and URLs."""
         return [
             {
                 'id': detail.id,
@@ -122,9 +132,11 @@ class OfferListSerializer(serializers.ModelSerializer):
         }
 
     def get_min_price(self, obj):
+        """Get minimum price among offer details."""
         details = obj.details.all()
         return min(d.price for d in details) if details.exists() else 0
 
     def get_min_delivery_time(self, obj):
+        """Get minimum delivery time among offer details."""
         details = obj.details.all()
         return min(d.delivery_time_in_days for d in details) if details.exists() else 0

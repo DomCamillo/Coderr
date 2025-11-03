@@ -6,9 +6,8 @@ from offers.models import OfferDetails
 class OrderCreateSerializer(serializers.Serializer):
     """Serializer for creating an Order."""
     offer_detail_id = serializers.IntegerField()
-
     def validate_offer_detail_id(self, value):
-        """Validate that the offer detail exists."""
+        """Validate if the offer detail exists."""
         try:
              OfferDetails.objects.get(id=value)
         except OfferDetails.DoesNotExist:
@@ -16,7 +15,10 @@ class OrderCreateSerializer(serializers.Serializer):
         return value
 
     def create(self, validated_data):
-        """create Order and copies data from offer detail."""
+        """ Create Order and copy data from OfferDetail.
+        Snapshots offer detail data to preserve order information even if
+        the original offer is modified or deleted later.
+        """
         offer_detail = OfferDetails.objects.get(id=validated_data['offer_detail_id'])
         order = Order.objects.create(
             customer_user=self.context['request'].user,

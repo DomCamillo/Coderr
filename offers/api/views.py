@@ -7,18 +7,11 @@ from offers.models import Offer, OfferDetails
 from offers.api.serializers import OfferSerializer, OfferDetailsSerializer, OfferListSerializer ,OfferDetailSerializer
 from offers.api.permissions import IsOfferOwner
 from rest_framework.permissions import IsAuthenticatedOrReadOnly , IsAuthenticated, AllowAny
-from rest_framework.pagination import PageNumberPagination
-
-
-class OfferPagination(PageNumberPagination):
-    page_size = 20
-    page_size_query_param = 'page_size'
-    max_page_size = 100
 
 class OfferViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing Offers with dynamic permissions and filtering."""
     queryset = Offer.objects.all()
     permission_classes = [IsAuthenticated]
-    pagination_class = OfferPagination
     filter_backends = [filters.DjangoFilterBackend, drf_filters.SearchFilter, drf_filters.OrderingFilter]
     filterset_fields = {'user': ['exact']}
     search_fields = ['title', 'description']
@@ -26,6 +19,7 @@ class OfferViewSet(viewsets.ModelViewSet):
     ordering = ['-updated_at']
 
     def get_serializer_class(self):
+        """retrun apprpiate serialzier based on action """
         if self.action == 'list':
             return OfferListSerializer
         elif self.action == 'retrieve':
@@ -33,6 +27,7 @@ class OfferViewSet(viewsets.ModelViewSet):
         else:
             return OfferSerializer
     def get_queryset(self):
+        """Apply filtering based on min_price and max_delivery_time query parameters."""
         queryset = Offer.objects.all()
 
         min_price = self.request.query_params.get('min_price')

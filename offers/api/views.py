@@ -6,11 +6,18 @@ from orders.api.permissions import IsBusinessUser
 from offers.models import Offer, OfferDetails
 from offers.api.serializers import OfferSerializer, OfferDetailsSerializer, OfferListSerializer ,OfferDetailSerializer
 from offers.api.permissions import IsOfferOwner
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly , IsAuthenticated, AllowAny
 
+
+class OfferPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 class OfferViewSet(viewsets.ModelViewSet):
     """ViewSet for managing Offers with dynamic permissions and filtering."""
     queryset = Offer.objects.all()
+    pagination_class = OfferPagination
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.DjangoFilterBackend, drf_filters.SearchFilter, drf_filters.OrderingFilter]
     filterset_fields = {'user': ['exact']}

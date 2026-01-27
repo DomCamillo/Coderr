@@ -18,8 +18,7 @@ static/
 local_settings.py
 
 # === Migrations ===
-**/migrations/**
-!**/migrations/__init__.py
+
 
 # === IDE & Editor Files ===
 .vscode/
